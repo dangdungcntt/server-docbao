@@ -32,7 +32,16 @@ app.post('/api/rss', (req, res) => {
   }
   rssParser.parseURL(fetchLink, (err, parsed) => {
     if (err) return res.json({ success: false, err });
-    const listNews = parsed.feed.entries;
+    let listNews = parsed.feed.entries;
+    listNews.sort(function(a, b) {
+      const timeA = new Date(a.pubDate).getTime();
+      const timeB = new Date(b.pubDate).getTime();
+      if (timeA > timeB)
+        return -1;
+      if (timeA < timeB)
+        return 1;
+      return 0;
+    });
     let data = [];
     for (let i = 0; i < 3; i++) {
       const { title, link, contentSnippet, pubDate, content } = listNews[i];
